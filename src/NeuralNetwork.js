@@ -1,13 +1,13 @@
-function sigmoid(num,i,j){
-    
-    return 1/(1+Math.pow(Math.E,-num));
-    
+function sigmoid(num, i, j) {
+
+    return 1 / (1 + Math.pow(Math.E, -num));
+
 }
 
-function dsigmoid(sigNum){
-    
-    return sigNum*(1-sigNum);
-    
+function dsigmoid(sigNum) {
+
+    return sigNum * (1 - sigNum);
+
 }
 
 class NeuralNetwork {
@@ -51,7 +51,8 @@ class NeuralNetwork {
             this.layers[i].map(sigmoid);
         }
 
-        this.layers[this.depth - 1].display();
+        //To display the result
+        //this.layers[this.depth - 1].display();
 
         var outputs = Matrix.toArray(this.layers[this.depth - 1]);
 
@@ -72,23 +73,23 @@ class NeuralNetwork {
 
         //stores errors
         let errors = [];
-        
+
         //stores changes in weights and biases
         let deltaW = [];
         let deltaB = [];
 
         //Cost funtion is mean squared error
-        
+
         //specify error for output layer
-        let derivativeMatrix = Matrix.map(this.layers[this.depth-1], dsigmoid);
+        let derivativeMatrix = Matrix.map(this.layers[this.depth - 1], dsigmoid);
         errors[this.depth - 1] = Matrix.subtractElementwise(this.layers[this.depth - 1], targets);
-        errors[this.depth-1] = Matrix.multiplyElementwise(errors[this.depth-1], derivativeMatrix);
-        
+        errors[this.depth - 1] = Matrix.multiplyElementwise(errors[this.depth - 1], derivativeMatrix);
+
         //calculate deltaB and deltaW for output layer
         let transposedInputs = Matrix.transpose(this.layers[this.depth - 2]);
-        deltaW[this.depth-1] = Matrix.matrixProduct(errors[this.depth - 1], transposedInputs);
-        deltaW[this.depth-1] = Matrix.multiplyScalar(deltaW[this.depth-1], -this.learningRate);
-        deltaB[this.depth-1] = Matrix.multiplyScalar(errors[this.depth-1], -this.learningRate);
+        deltaW[this.depth - 1] = Matrix.matrixProduct(errors[this.depth - 1], transposedInputs);
+        deltaW[this.depth - 1] = Matrix.multiplyScalar(deltaW[this.depth - 1], -this.learningRate);
+        deltaB[this.depth - 1] = Matrix.multiplyScalar(errors[this.depth - 1], -this.learningRate);
 
         //for each layer from 2nd last to 1st hidden, calculate error and then deltaW and deltaB
         for (var i = this.depth - 2; i > 0; i--) {
@@ -107,13 +108,13 @@ class NeuralNetwork {
             deltaB[i] = Matrix.multiplyScalar(errors[i], -this.learningRate);
 
         }
-        
+
         //update weights and biases
-        for(var i=1;i<this.depth;i++){
-            
+        for (var i = 1; i < this.depth; i++) {
+
             this.weights[i] = Matrix.addElementwise(this.weights[i], deltaW[i]);
             this.biases[i] = Matrix.addElementwise(this.biases[i], deltaB[i]);
-            
+
         }
 
     }
