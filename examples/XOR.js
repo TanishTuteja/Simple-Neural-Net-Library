@@ -12,11 +12,13 @@ let data = [{
     target: [0]
 }]
 
-let iterations = 100000;
+let iterations = 5000;
 let input = [0, 0];
 let target = 1;
 
-let nn = new NeuralNetwork(3, [2, 10, 1], 0.1);
+let nn = new NeuralNetwork(3, [2, 10, 1], 1);
+
+let myGraph = new Graph(4, 0.002);
 
 for (let i = 0; i < iterations; i++) {
 
@@ -25,9 +27,12 @@ for (let i = 0; i < iterations; i++) {
     let inputs = data[index].input;
     let targets = data[index].target;
 
+    let outputs = nn.feedForward(inputs);
+
+    let error = outputs[0] - targets[0];
+    myGraph.addData(i, Math.abs(error));
+
     nn.train(targets, inputs);
 }
 
-let out = nn.feedForward([1, 1]);
-console.log(out);
-//console.log("Error: " + (outputs[0] - targets[0]) + " Inputs: " + inputs.toString() + " Outputs: " + outputs.toString() + " Targets: " + targets.toString());
+myGraph.update();
