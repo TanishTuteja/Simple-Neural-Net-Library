@@ -139,7 +139,7 @@ class Graph {
 
     let maxX = (this.width - 2 * this.margin) * this.xScale;
     let y = this.height - this.margin + 10;
-    let pixelGap = 40;
+    let pixelGap = 120;
     let incX = pixelGap * this.xScale;
 
     this.ctx.font = "20x Arial";

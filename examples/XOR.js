@@ -1,27 +1,32 @@
-let data = [{
+let data = [
+  {
     input: [0, 0],
     target: [0]
-}, {
+  },
+  {
     input: [0, 1],
     target: [1]
-}, {
+  },
+  {
     input: [1, 0],
     target: [1]
-}, {
+  },
+  {
     input: [1, 1],
     target: [0]
-}]
+  }
+];
 
-let iterations = 5000;
-let input = [0, 0];
-let target = 1;
+let iterations = 10000;
 
 let nn = new NeuralNetwork(3, [2, 10, 1], 1);
 
-let myGraph = new Graph(4, 0.002);
+let myGraph = new Graph(10, 0.002);
 
-for (let i = 0; i < iterations; i++) {
+train();
 
+function train() {
+  for (let i = 0; i < iterations; i++) {
     let index = Math.floor(Math.random() * data.length);
 
     let inputs = data[index].input;
@@ -30,9 +35,16 @@ for (let i = 0; i < iterations; i++) {
     let outputs = nn.feedForward(inputs);
 
     let error = outputs[0] - targets[0];
-    myGraph.addData(i, Math.abs(error));
 
-    nn.train(targets, inputs);
+    if (i % 100 == 0) {
+      sleep(0).then(() => {
+        myGraph.addData(i, Math.abs(error));
+      });
+    }
+    nn.train(targets);
+  }
 }
 
-myGraph.update();
+function sleep(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
