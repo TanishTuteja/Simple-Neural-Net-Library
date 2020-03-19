@@ -21,7 +21,7 @@ let iterations = 10000;
 
 let nn = new NeuralNetwork(3, [2, 10, 1], 1);
 
-let myGraph = new Graph(10, 0.002);
+let myGraph = new LineGraph(1000, 0.1);
 
 train();
 
