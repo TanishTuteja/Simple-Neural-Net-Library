@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>XOR Neural Network</title>
+    <script src="libs/LineGraph.js"></script>
+  </head>
+
+  <body>
+    <script>
+      let options = {
+        method: "POST"
+      };
+      fetch("/errorData", options)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          let errorData = data.errorData;
+          let myGraph = new LineGraph(1000, 0.1);
+          for (let i = 0; i < errorData.length; i += 100) {
+            let currData = errorData[i];
+            myGraph.addData(currData.iter, currData.error, false);
+          }
+          myGraph.update();
+        });
+    </script>
+  </body>
+</html>
