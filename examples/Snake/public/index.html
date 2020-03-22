@@ -1,0 +1,15 @@
+<html>
+  <head>
+    <title>Snake Neural Network</title>
+    <script src="Snake.js"></script>
+  </head>
+
+  <body>
+    <script>
+      let snakeGame = new Snake(400, 20);
+      setInterval(() => {
+        snakeGame.update();
+      }, snakeGame.updateTime);
+    </script>
+  </body>
+</html>

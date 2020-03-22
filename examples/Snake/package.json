@@ -1,0 +1,15 @@
+{
+  "name": "nn-snake",
+  "version": "1.0.0",
+  "description": "Example to show Neural Network using Snake Game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Tanish Tuteja",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
