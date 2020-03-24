@@ -59,6 +59,9 @@ class Snake {
           break;
       }
     };
+
+    this.stateLength = this.gridNum * this.gridNum + 6;
+    this.actionNum = 4;
   }
 
   update() {
@@ -95,6 +98,14 @@ class Snake {
 
       if (!this.noRender) {
         this.render();
+      }
+
+      if (collided) {
+        return 0;
+      } else if (gotFood) {
+        return 1;
+      } else {
+        return 0.5;
       }
     }
   }
@@ -224,5 +235,30 @@ class Snake {
         this.snakeVel = { x: 1, y: 0 };
         break;
     }
+  }
+
+  getState() {
+    let state = [];
+
+    for (let i = 0; i < this.gridNum; i++) {
+      for (let j = 0; j < this.gridNum; j++) {
+        state[i * this.gridNum + j] = 0;
+      }
+    }
+
+    for (let i = 0; i < this.snake.length; i++) {
+      let element = this.snake[i];
+      state[element.x * this.gridNum + element.y] = 1;
+    }
+
+    let head = this.snake[0];
+    state.push(head.x);
+    state.push(head.y);
+    state.push(this.food.x);
+    state.push(this.food.y);
+    state.push(this.snakeVel.x);
+    state.push(this.snakeVel.y);
+
+    return state;
   }
 }

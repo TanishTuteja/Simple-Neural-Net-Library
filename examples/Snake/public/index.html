@@ -7,8 +7,35 @@
   <body>
     <script>
       let snakeGame = new Snake(400, 20);
-      setInterval(() => {
-        snakeGame.update();
+      let reward = null;
+
+      let stateLength = snakeGame.stateLength;
+      let actionNum = snakeGame.actionNum;
+      let data = { stateLength, actionNum };
+      let options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      };
+
+      fetch("/initialize", options);
+
+      let intervalID = setInterval(() => {
+        console.log("running");
+        let state = snakeGame.getState();
+        data = { state, reward };
+        options.body = JSON.stringify(data);
+        fetch("/action", options)
+          .then(response => {
+            return response.json();
+          })
+          .then(data => {
+            let action = data.action;
+            snakeGame.doAction(action);
+            reward = snakeGame.update();
+          });
       }, snakeGame.updateTime);
     </script>
   </body>
