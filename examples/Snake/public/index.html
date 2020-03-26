@@ -6,7 +6,7 @@
 
   <body>
     <script>
-      let snakeGame = new Snake(400, 20);
+      let snakeGame = new Snake(200, 10);
       let reward = null;
 
       let stateLength = snakeGame.stateLength;
@@ -22,8 +22,9 @@
 
       fetch("/initialize", options);
 
-      let intervalID = setInterval(() => {
-        console.log("running");
+      let intervalID = setInterval(updateGame, snakeGame.updateTime);
+
+      function updateGame() {
         let state = snakeGame.getState();
         data = { state, reward };
         options.body = JSON.stringify(data);
@@ -32,11 +33,23 @@
             return response.json();
           })
           .then(data => {
-            let action = data.action;
-            snakeGame.doAction(action);
-            reward = snakeGame.update();
+            if (snakeGame.alive) {
+              let action = data.action;
+              snakeGame.doAction(action);
+              reward = snakeGame.update();
+            } else {
+              fetch("/train", options).then(response => {
+                clearInterval(intervalID);
+                snakeGame.restart();
+                newInterval();
+              });
+            }
           });
-      }, snakeGame.updateTime);
+      }
+
+      function newInterval() {
+        intervalID = setInterval(updateGame, snakeGame.updateTime);
+      }
     </script>
   </body>
 </html>

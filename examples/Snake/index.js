@@ -24,3 +24,17 @@ app.post("/action", (req, res) => {
   let action = agent.getAction(state, reward);
   res.json({ action: action });
 });
+
+app.post("/train", (req, res) => {
+  // let data = req.body;
+  // let state = data.state;
+  // let reward = data.reward;
+
+  // let action = agent.getAction(state, reward);
+  // res.json({ action: action });
+  console.log("Training..");
+  agent.currState = null;
+  agent.currAction = null;
+  agent.train();
+  res.end();
+});
