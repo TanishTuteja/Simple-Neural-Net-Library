@@ -9,13 +9,15 @@ function dsigmoid(sigNum) {
 }
 
 class NeuralNetwork {
-  constructor(depth, nodeCounts, learningRate) {
+  constructor(depth, nodeCounts, learningRate, fileToLoad) {
     this.depth = depth;
     this.learningRate = learningRate;
 
     this.layers = [];
     this.weights = [];
     this.biases = [];
+
+    this.load(fileToLoad);
 
     for (var i = 0; i < depth; i++) {
       this.layers[i] = new Matrix(nodeCounts[i], 1);
@@ -113,6 +115,41 @@ class NeuralNetwork {
     for (var i = 1; i < this.depth; i++) {
       this.weights[i] = Matrix.addElementwise(this.weights[i], deltaW[i]);
       this.biases[i] = Matrix.addElementwise(this.biases[i], deltaB[i]);
+    }
+  }
+
+  save(path) {
+    var fs = require("fs");
+
+    let contentObj = {
+      weights: this.weights,
+      biases: this.biases
+    };
+
+    const content = JSON.stringify(contentObj);
+
+    try {
+      const data = fs.writeFileSync(path, content);
+      console.log("Saved NN");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  load(path) {
+    var fs = require("fs");
+
+    try {
+      let data = fs.readFileSync(path, "utf-8");
+
+      let content = JSON.parse(data);
+
+      this.weights = content.weights;
+      this.biases = content.biases;
+
+      console.log("Loaded NN");
+    } catch (err) {
+      console.error(err);
     }
   }
 }

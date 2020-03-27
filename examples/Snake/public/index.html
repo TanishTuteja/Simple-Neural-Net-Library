@@ -50,6 +50,10 @@
       function newInterval() {
         intervalID = setInterval(updateGame, snakeGame.updateTime);
       }
+
+      window.addEventListener("unload", function(event) {
+        fetch("/exit", options);
+      });
     </script>
   </body>
 </html>

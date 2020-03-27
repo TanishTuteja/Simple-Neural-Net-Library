@@ -2,7 +2,7 @@ var express = require("express");
 var Agent = require("./Agent.js").Agent;
 
 const app = express();
-app.listen(3000, () => {
+const server = app.listen(3000, () => {
   console.log("Listening at 3000...");
 });
 
@@ -13,7 +13,11 @@ let agent;
 
 app.post("/initialize", (req, res) => {
   let data = req.body;
-  agent = new Agent(data.stateLength, data.actionNum);
+  agent = new Agent(
+    data.stateLength,
+    data.actionNum,
+    __dirname + "/configData.json"
+  );
 });
 
 app.post("/action", (req, res) => {
@@ -36,5 +40,11 @@ app.post("/train", (req, res) => {
   agent.currState = null;
   agent.currAction = null;
   agent.train();
+  res.end();
+});
+
+app.post("/exit", (req, res) => {
+  console.log("Exiting");
+  agent.nn.save(__dirname + "/configData.json");
   res.end();
 });

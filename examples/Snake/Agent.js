@@ -1,8 +1,13 @@
 var NeuralNetwork = require("../../src/NeuralNetwork.js").NeuralNetwork;
 
 class Agent {
-  constructor(stateLength, actionNum) {
-    this.nn = new NeuralNetwork(3, [stateLength, 100, actionNum]);
+  constructor(stateLength, actionNum, fileToLoad) {
+    this.nn = new NeuralNetwork(
+      3,
+      [stateLength, 100, actionNum],
+      1,
+      fileToLoad
+    );
     this.eGreed = 0.9;
     this.trainingData = [];
     this.currState = null;
