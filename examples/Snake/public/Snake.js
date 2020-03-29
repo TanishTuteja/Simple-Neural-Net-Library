@@ -10,6 +10,8 @@ class Snake {
 
     this.noRender = false;
 
+    this.noInput = false;
+
     this.snake = [{ x: Math.floor(gridNum / 2), y: Math.floor(gridNum / 2) }];
     this.snakeVel = { x: 0, y: -1 };
 
@@ -42,21 +44,23 @@ class Snake {
     }
 
     document.onkeydown = function checkKey(e) {
-      e = e || window.event;
+      if (!this.noInput) {
+        e = e || window.event;
 
-      switch (e.keyCode) {
-        case 38:
-          self.doAction(0);
-          break;
-        case 40:
-          self.doAction(1);
-          break;
-        case 37:
-          self.doAction(2);
-          break;
-        case 39:
-          self.doAction(3);
-          break;
+        switch (e.keyCode) {
+          case 38:
+            self.doAction(0);
+            break;
+          case 40:
+            self.doAction(1);
+            break;
+          case 37:
+            self.doAction(2);
+            break;
+          case 39:
+            self.doAction(3);
+            break;
+        }
       }
     };
 
@@ -235,16 +239,24 @@ class Snake {
   doAction(action) {
     switch (action) {
       case 0:
-        this.snakeVel = { x: 0, y: -1 };
+        if (this.snakeVel.y != 1) {
+          this.snakeVel = { x: 0, y: -1 };
+        }
         break;
       case 1:
-        this.snakeVel = { x: 0, y: 1 };
+        if (this.snakeVel.y != -1) {
+          this.snakeVel = { x: 0, y: 1 };
+        }
         break;
       case 2:
-        this.snakeVel = { x: -1, y: 0 };
+        if (this.snakeVel.x != 1) {
+          this.snakeVel = { x: -1, y: 0 };
+        }
         break;
       case 3:
-        this.snakeVel = { x: 1, y: 0 };
+        if (this.snakeVel.x != -1) {
+          this.snakeVel = { x: 1, y: 0 };
+        }
         break;
     }
   }
@@ -268,13 +280,13 @@ class Snake {
     }
 
     for (let i = 0; i < this.snake.length; i++) {
-      let element = this.snake[i];
+      let element = { x: this.snake[i].x, y: this.snake[i].y };
       state[(element.x + 1) * this.gridNum + (element.y + 1)] = 1;
     }
 
     state[(this.food.x + 1) * this.gridNum + (this.food.y + 1)] = 2;
 
-    let head = this.snake[0];
+    let head = { x: this.snake[0].x, y: this.snake[0].y };
     state.push(head.x + 1);
     state.push(head.y + 1);
     state.push(this.food.x + 1);
@@ -283,5 +295,9 @@ class Snake {
     state.push(this.snakeVel.y);
 
     return state;
+  }
+
+  getScore() {
+    return this.snake.length;
   }
 }

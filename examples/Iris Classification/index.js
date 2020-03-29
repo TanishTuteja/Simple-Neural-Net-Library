@@ -40,7 +40,7 @@ shuffleArray(trainingData);
 let trainIterations = 50000;
 let trainFrac = 0.9;
 
-let nn = new NeuralNetwork(4, [4, 20, 20, 3], 1);
+let nn = new NeuralNetwork([4, 20, 20, 3], 0.1);
 
 let trainData = [];
 let testData = [];

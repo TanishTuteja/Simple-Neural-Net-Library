@@ -9,21 +9,19 @@ function dsigmoid(sigNum) {
 }
 
 class NeuralNetwork {
-  constructor(depth, nodeCounts, learningRate, fileToLoad) {
-    this.depth = depth;
+  constructor(nodeCounts, learningRate) {
+    this.depth = nodeCounts.length;
     this.learningRate = learningRate;
 
     this.layers = [];
     this.weights = [];
     this.biases = [];
 
-    this.load(fileToLoad);
-
-    for (var i = 0; i < depth; i++) {
+    for (var i = 0; i < this.depth; i++) {
       this.layers[i] = new Matrix(nodeCounts[i], 1);
     }
 
-    for (var i = 1; i < depth; i++) {
+    for (var i = 1; i < this.depth; i++) {
       this.weights[i] = new Matrix(nodeCounts[i], nodeCounts[i - 1]);
       this.weights[i].randomize(-1, 1);
 
@@ -130,9 +128,9 @@ class NeuralNetwork {
 
     try {
       const data = fs.writeFileSync(path, content);
-      console.log("Saved NN");
+      console.log("Saved NN successfully");
     } catch (err) {
-      console.error(err);
+      console.log("Couldn't save NN");
     }
   }
 
@@ -147,9 +145,9 @@ class NeuralNetwork {
       this.weights = content.weights;
       this.biases = content.biases;
 
-      console.log("Loaded NN");
+      console.log("Loaded NN successfully");
     } catch (err) {
-      console.error(err);
+      console.log("Failed to load file, going with new NN");
     }
   }
 }

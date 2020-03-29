@@ -22,7 +22,7 @@ let data = [
 
 let iterations = 10000;
 
-let nn = new NeuralNetwork(3, [2, 10, 1], 1);
+let nn = new NeuralNetwork([2, 10, 1], 1);
 
 let errorData = [];
 

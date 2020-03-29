@@ -2,12 +2,12 @@ var NeuralNetwork = require("../../src/NeuralNetwork.js").NeuralNetwork;
 
 class Agent {
   constructor(stateLength, actionNum, fileToLoad) {
-    this.nn = new NeuralNetwork(
-      3,
-      [stateLength, 100, actionNum],
-      1,
-      fileToLoad
-    );
+    this.nn = new NeuralNetwork([stateLength, 100, actionNum], 1);
+    if (fileToLoad) {
+      this.nn.load(fileToLoad);
+    } else {
+      console.log("No File Specified, Generating Random NN");
+    }
     this.eGreed = 0.9;
     this.trainingData = [];
     this.currState = null;
@@ -101,6 +101,10 @@ class Agent {
       }
     }
     return maxValue;
+  }
+
+  saveNetwork(savePath) {
+    this.nn.save(savePath);
   }
 }
 

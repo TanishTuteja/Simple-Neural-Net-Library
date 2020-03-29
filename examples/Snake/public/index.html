@@ -5,54 +5,38 @@
   </head>
 
   <body>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+      var io = io();
       let snakeGame = new Snake(200, 10);
       let reward = null;
 
-      let stateLength = snakeGame.stateLength;
-      let actionNum = snakeGame.actionNum;
-      let data = { stateLength, actionNum };
-      let options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
+      let data = {
+        stateLength: snakeGame.stateLength,
+        actionNum: snakeGame.actionNum
       };
 
-      fetch("/initialize", options);
+      io.emit("initialize", data);
 
       let intervalID = setInterval(updateGame, snakeGame.updateTime);
 
       function updateGame() {
         let state = snakeGame.getState();
-        data = { state, reward };
-        options.body = JSON.stringify(data);
-        fetch("/action", options)
-          .then(response => {
-            return response.json();
-          })
-          .then(data => {
-            if (snakeGame.alive) {
-              let action = data.action;
-              snakeGame.doAction(action);
-              reward = snakeGame.update();
-            } else {
-              fetch("/train", options).then(response => {
-                clearInterval(intervalID);
-                snakeGame.restart();
-                newInterval();
-              });
-            }
-          });
+        data = { state: state, reward: reward };
+        io.emit("action", data);
       }
 
-      function newInterval() {
-        intervalID = setInterval(updateGame, snakeGame.updateTime);
-      }
-
-      window.addEventListener("unload", function(event) {
-        fetch("/exit", options);
+      io.on("actionRes", data => {
+        if (snakeGame.alive) {
+          let action = data.action;
+          snakeGame.doAction(action);
+          reward = snakeGame.update();
+        } else {
+          io.emit("train");
+          clearInterval(intervalID);
+          snakeGame.restart();
+          intervalID = setInterval(updateGame, snakeGame.updateTime);
+        }
       });
     </script>
   </body>
