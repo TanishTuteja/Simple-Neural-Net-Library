@@ -9,19 +9,19 @@ function dsigmoid(sigNum) {
 }
 
 class NeuralNetwork {
-  constructor(depth, nodeCounts, learningRate) {
-    this.depth = depth;
+  constructor(nodeCounts, learningRate) {
+    this.depth = nodeCounts.length;
     this.learningRate = learningRate;
 
     this.layers = [];
     this.weights = [];
     this.biases = [];
 
-    for (var i = 0; i < depth; i++) {
+    for (var i = 0; i < this.depth; i++) {
       this.layers[i] = new Matrix(nodeCounts[i], 1);
     }
 
-    for (var i = 1; i < depth; i++) {
+    for (var i = 1; i < this.depth; i++) {
       this.weights[i] = new Matrix(nodeCounts[i], nodeCounts[i - 1]);
       this.weights[i].randomize(-1, 1);
 
@@ -113,6 +113,41 @@ class NeuralNetwork {
     for (var i = 1; i < this.depth; i++) {
       this.weights[i] = Matrix.addElementwise(this.weights[i], deltaW[i]);
       this.biases[i] = Matrix.addElementwise(this.biases[i], deltaB[i]);
+    }
+  }
+
+  save(path) {
+    var fs = require("fs");
+
+    let contentObj = {
+      weights: this.weights,
+      biases: this.biases
+    };
+
+    const content = JSON.stringify(contentObj);
+
+    try {
+      const data = fs.writeFileSync(path, content);
+      console.log("Saved NN successfully");
+    } catch (err) {
+      console.log("Couldn't save NN");
+    }
+  }
+
+  load(path) {
+    var fs = require("fs");
+
+    try {
+      let data = fs.readFileSync(path, "utf-8");
+
+      let content = JSON.parse(data);
+
+      this.weights = content.weights;
+      this.biases = content.biases;
+
+      console.log("Loaded NN successfully");
+    } catch (err) {
+      console.log("Failed to load file, going with new NN");
     }
   }
 }

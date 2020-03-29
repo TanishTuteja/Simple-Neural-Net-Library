@@ -10,12 +10,14 @@ class Snake {
 
     this.noRender = false;
 
+    this.noInput = false;
+
     this.snake = [{ x: Math.floor(gridNum / 2), y: Math.floor(gridNum / 2) }];
     this.snakeVel = { x: 0, y: -1 };
 
     this.generateFood();
 
-    this.updateTime = 200;
+    this.updateTime = 500;
 
     let myCanvas = document.createElement("canvas");
 
@@ -42,23 +44,28 @@ class Snake {
     }
 
     document.onkeydown = function checkKey(e) {
-      e = e || window.event;
+      if (!this.noInput) {
+        e = e || window.event;
 
-      switch (e.keyCode) {
-        case 38:
-          self.doAction(0);
-          break;
-        case 40:
-          self.doAction(1);
-          break;
-        case 37:
-          self.doAction(2);
-          break;
-        case 39:
-          self.doAction(3);
-          break;
+        switch (e.keyCode) {
+          case 38:
+            self.doAction(0);
+            break;
+          case 40:
+            self.doAction(1);
+            break;
+          case 37:
+            self.doAction(2);
+            break;
+          case 39:
+            self.doAction(3);
+            break;
+        }
       }
     };
+
+    this.stateLength = (this.gridNum + 2) * (this.gridNum + 2) + 6;
+    this.actionNum = 4;
   }
 
   update() {
@@ -96,6 +103,14 @@ class Snake {
       if (!this.noRender) {
         this.render();
       }
+
+      if (collided) {
+        return 0;
+      } else if (gotFood) {
+        return 1;
+      } else {
+        return 0.5;
+      }
     }
   }
 
@@ -103,6 +118,18 @@ class Snake {
     this.drawBG();
     this.drawSnake();
     this.drawFood();
+  }
+
+  restart() {
+    this.alive = true;
+    this.snake = [
+      { x: Math.floor(this.gridNum / 2), y: Math.floor(this.gridNum / 2) }
+    ];
+    this.snakeVel = { x: 0, y: -1 };
+
+    this.generateFood();
+    this.drawWalls();
+    this.render();
   }
 
   checkCollisions() {
@@ -212,17 +239,65 @@ class Snake {
   doAction(action) {
     switch (action) {
       case 0:
-        this.snakeVel = { x: 0, y: -1 };
+        if (this.snakeVel.y != 1) {
+          this.snakeVel = { x: 0, y: -1 };
+        }
         break;
       case 1:
-        this.snakeVel = { x: 0, y: 1 };
+        if (this.snakeVel.y != -1) {
+          this.snakeVel = { x: 0, y: 1 };
+        }
         break;
       case 2:
-        this.snakeVel = { x: -1, y: 0 };
+        if (this.snakeVel.x != 1) {
+          this.snakeVel = { x: -1, y: 0 };
+        }
         break;
       case 3:
-        this.snakeVel = { x: 1, y: 0 };
+        if (this.snakeVel.x != -1) {
+          this.snakeVel = { x: 1, y: 0 };
+        }
         break;
     }
+  }
+
+  getState() {
+    let state = [];
+
+    for (let i = 0; i < this.gridNum + 2; i++) {
+      for (let j = 0; j < this.gridNum + 2; j++) {
+        state[i * this.gridNum + j] = 0;
+      }
+    }
+
+    let tempVar = (this.gridNum + 1) * (this.gridNum + 2);
+    let tempVar2 = this.gridNum + 2;
+    for (let i = 0; i < tempVar2; i++) {
+      state[i] = 3;
+      state[tempVar + i] = 3;
+      state[i * tempVar2] = 3;
+      state[(i + 1) * tempVar2 - 1] = 3;
+    }
+
+    for (let i = 0; i < this.snake.length; i++) {
+      let element = { x: this.snake[i].x, y: this.snake[i].y };
+      state[(element.x + 1) * this.gridNum + (element.y + 1)] = 1;
+    }
+
+    state[(this.food.x + 1) * this.gridNum + (this.food.y + 1)] = 2;
+
+    let head = { x: this.snake[0].x, y: this.snake[0].y };
+    state.push(head.x + 1);
+    state.push(head.y + 1);
+    state.push(this.food.x + 1);
+    state.push(this.food.y + 1);
+    state.push(this.snakeVel.x);
+    state.push(this.snakeVel.y);
+
+    return state;
+  }
+
+  getScore() {
+    return this.snake.length;
   }
 }

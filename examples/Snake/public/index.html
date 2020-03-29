@@ -5,11 +5,39 @@
   </head>
 
   <body>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-      let snakeGame = new Snake(400, 20);
-      setInterval(() => {
-        snakeGame.update();
-      }, snakeGame.updateTime);
+      var io = io();
+      let snakeGame = new Snake(200, 10);
+      let reward = null;
+
+      let data = {
+        stateLength: snakeGame.stateLength,
+        actionNum: snakeGame.actionNum
+      };
+
+      io.emit("initialize", data);
+
+      let intervalID = setInterval(updateGame, snakeGame.updateTime);
+
+      function updateGame() {
+        let state = snakeGame.getState();
+        data = { state: state, reward: reward };
+        io.emit("action", data);
+      }
+
+      io.on("actionRes", data => {
+        if (snakeGame.alive) {
+          let action = data.action;
+          snakeGame.doAction(action);
+          reward = snakeGame.update();
+        } else {
+          io.emit("train");
+          clearInterval(intervalID);
+          snakeGame.restart();
+          intervalID = setInterval(updateGame, snakeGame.updateTime);
+        }
+      });
     </script>
   </body>
 </html>
