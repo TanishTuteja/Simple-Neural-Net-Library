@@ -4,6 +4,9 @@ var NeuralNetwork = require("../../src/NeuralNetwork.js");
 
 let trainingData = [];
 
+let trainData = [];
+let testData = [];
+
 let data = fs.readFileSync("iris.data", "utf-8");
 let datas = data.split("\n");
 
@@ -36,12 +39,25 @@ let trainIterations = 50000;
 let trainFrac = 0.9;
 
 let nn = new NeuralNetwork([4, 20, 20, 3], 0.1);
+nn.load(__dirname + "/configData.json");
 
-let trainData = [];
-let testData = [];
+function exitHandler(options, exitCode) {
+  if (options.cleanup) {
+    nn.save(__dirname + "/configData.json");
+  }
+  if (exitCode || exitCode === 0) console.log(exitCode);
+  if (options.exit) process.exit();
+}
 
-train();
-test();
+//do something when app is closing
+process.on("exit", exitHandler.bind(null, { cleanup: true }));
+
+//catches ctrl+c event
+process.on("SIGINT", exitHandler.bind(null, { exit: true }));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on("SIGUSR1", exitHandler.bind(null, { exit: true }));
+process.on("SIGUSR2", exitHandler.bind(null, { exit: true }));
 
 const app = express();
 app.listen(3000, () => {
@@ -55,6 +71,11 @@ app.post("/trainData", (req, res) => {
 app.post("/testData", (req, res) => {
   res.json({ errorData: testData });
 });
+
+setInterval(() => {
+  train();
+  test();
+}, 5000);
 
 function train() {
   for (let i = 0; i < trainIterations; i++) {
