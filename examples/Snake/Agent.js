@@ -1,19 +1,38 @@
-var NeuralNetwork = require("../../src/NeuralNetwork.js").NeuralNetwork;
+var NeuralNetwork = require("../../src/NeuralNetwork.js");
 
 class Agent {
-  constructor(stateLength, actionNum, fileToLoad) {
-    this.nn = new NeuralNetwork([stateLength, 100, actionNum], 1);
+  constructor(stateLength, actionNum, fileToLoad, trainingFileToLoad) {
+    this.nn = new NeuralNetwork([stateLength, 50, 20, actionNum], 0.5);
     if (fileToLoad) {
       this.nn.load(fileToLoad);
     } else {
       console.log("No File Specified, Generating Random NN");
     }
-    this.eGreed = 0.9;
+
+    this.trainingNum = 0;
+
+    if (trainingFileToLoad) {
+      var fs = require("fs");
+      try {
+        let data = fs.readFileSync(trainingFileToLoad, "utf-8");
+        let content = JSON.parse(data);
+
+        this.trainingNum = content.trainingNum;
+
+        console.log("Loaded Training Count successfully");
+      } catch (err) {
+        console.log("Failed to load Training Count, initial training count will be 0");
+      }
+    }
+
+    this.defaultEGreed = 0.95;
+    this.eGreedTimeConst = 100;
+    this.eGreed = this.defaultEGreed * Math.exp(-this.trainingNum / this.eGreedTimeConst);
     this.trainingData = [];
     this.currState = null;
     this.currAction = null;
     this.batchSize = 100;
-    this.memory = 10000;
+    this.memory = 1000;
     this.discountFac = 0.9;
   }
 
@@ -26,7 +45,7 @@ class Agent {
         prevState: this.currState,
         action: this.currAction,
         reward: reward,
-        newState: newState
+        newState: newState,
       });
     }
 
@@ -71,8 +90,12 @@ class Agent {
       targets[currData.action] = expectedQ;
       this.nn.train(targets, currData.prevState);
     }
+
+    this.trainingNum++;
+    this.eGreed = this.defaultEGreed * Math.exp(-this.trainingNum / this.eGreedTimeConst);
   }
-  softMax(values, beta = 1) {
+
+  softMax(values, beta = 5) {
     let intermediates = [];
     let probs = [];
     let total = 0;
@@ -103,8 +126,22 @@ class Agent {
     return maxValue;
   }
 
-  saveNetwork(savePath) {
-    this.nn.save(savePath);
+  saveNetwork(savePathNetwork, savePathTraining) {
+    this.nn.save(savePathNetwork);
+    var fs = require("fs");
+
+    let contentObj = {
+      trainingNum: this.trainingNum,
+    };
+
+    const content = JSON.stringify(contentObj);
+
+    try {
+      const data = fs.writeFileSync(savePathTraining, content);
+      console.log("Saved Training Count successfully");
+    } catch (err) {
+      console.log("Couldn't save Training Count");
+    }
   }
 }
 

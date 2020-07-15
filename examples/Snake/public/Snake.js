@@ -10,14 +10,14 @@ class Snake {
 
     this.noRender = false;
 
-    this.noInput = false;
+    this.noInput = true;
 
     this.snake = [{ x: Math.floor(gridNum / 2), y: Math.floor(gridNum / 2) }];
     this.snakeVel = { x: 0, y: -1 };
 
     this.generateFood();
 
-    this.updateTime = 500;
+    this.updateTime = 200;
 
     let myCanvas = document.createElement("canvas");
 
@@ -72,11 +72,11 @@ class Snake {
     if (this.alive) {
       let temp = {
         x: this.snake[this.snake.length - 1].x,
-        y: this.snake[this.snake.length - 1].y
+        y: this.snake[this.snake.length - 1].y,
       };
       let newHead = {
         x: this.snake[0].x + this.snakeVel.x,
-        y: this.snake[0].y + this.snakeVel.y
+        y: this.snake[0].y + this.snakeVel.y,
       };
 
       let collided = false;
@@ -122,9 +122,7 @@ class Snake {
 
   restart() {
     this.alive = true;
-    this.snake = [
-      { x: Math.floor(this.gridNum / 2), y: Math.floor(this.gridNum / 2) }
-    ];
+    this.snake = [{ x: Math.floor(this.gridNum / 2), y: Math.floor(this.gridNum / 2) }];
     this.snakeVel = { x: 0, y: -1 };
 
     this.generateFood();
@@ -135,12 +133,7 @@ class Snake {
   checkCollisions() {
     let head = this.snake[0];
 
-    if (
-      head.x < 0 ||
-      head.x >= this.gridNum ||
-      head.y < 0 ||
-      head.y >= this.gridNum
-    ) {
+    if (head.x < 0 || head.x >= this.gridNum || head.y < 0 || head.y >= this.gridNum) {
       return true;
     } else {
       return false;
@@ -183,57 +176,27 @@ class Snake {
   drawWalls() {
     this.ctx.fillStyle = "rgb(255,0,0)";
     this.ctx.fillRect(0, 0, (this.gridNum + 2) * this.gridSize, this.gridSize);
-    this.ctx.fillRect(
-      0,
-      this.gridSize,
-      this.gridSize,
-      this.gridNum * this.gridSize
-    );
-    this.ctx.fillRect(
-      (this.gridNum + 1) * this.gridSize,
-      this.gridSize,
-      this.gridSize,
-      this.gridNum * this.gridSize
-    );
-    this.ctx.fillRect(
-      0,
-      (this.gridNum + 1) * this.gridSize,
-      (this.gridNum + 2) * this.gridSize,
-      this.gridSize
-    );
+    this.ctx.fillRect(0, this.gridSize, this.gridSize, this.gridNum * this.gridSize);
+    this.ctx.fillRect((this.gridNum + 1) * this.gridSize, this.gridSize, this.gridSize, this.gridNum * this.gridSize);
+    this.ctx.fillRect(0, (this.gridNum + 1) * this.gridSize, (this.gridNum + 2) * this.gridSize, this.gridSize);
   }
 
   drawBG() {
     this.ctx.fillStyle = "rgb(0,0,0)";
-    this.ctx.fillRect(
-      this.gridSize,
-      this.gridSize,
-      this.gameSize,
-      this.gameSize
-    );
+    this.ctx.fillRect(this.gridSize, this.gridSize, this.gameSize, this.gameSize);
   }
 
   drawSnake() {
     this.ctx.fillStyle = "rgb(255,255,255)";
     for (let i = 0; i < this.snake.length; i++) {
       const currPart = this.snake[i];
-      this.ctx.fillRect(
-        currPart.x * this.gridSize + this.gridSize,
-        currPart.y * this.gridSize + this.gridSize,
-        this.gridSize,
-        this.gridSize
-      );
+      this.ctx.fillRect(currPart.x * this.gridSize + this.gridSize, currPart.y * this.gridSize + this.gridSize, this.gridSize, this.gridSize);
     }
   }
 
   drawFood() {
     this.ctx.fillStyle = "rgb(0,0,255)";
-    this.ctx.fillRect(
-      this.food.x * this.gridSize + this.gridSize,
-      this.food.y * this.gridSize + this.gridSize,
-      this.gridSize,
-      this.gridSize
-    );
+    this.ctx.fillRect(this.food.x * this.gridSize + this.gridSize, this.food.y * this.gridSize + this.gridSize, this.gridSize, this.gridSize);
   }
 
   doAction(action) {

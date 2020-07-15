@@ -1,4 +1,4 @@
-var Matrix = require("../lib/Matrix.js").Matrix;
+var Matrix = require("../lib/Matrix.js");
 
 function sigmoid(num, i, j) {
   return 1 / (1 + Math.pow(Math.E, -num));
@@ -33,10 +33,7 @@ class NeuralNetwork {
     this.layers[0] = Matrix.fromArray(inputs);
 
     for (var i = 1; i < this.depth; i++) {
-      this.layers[i] = Matrix.matrixProduct(
-        this.weights[i],
-        this.layers[i - 1]
-      );
+      this.layers[i] = Matrix.matrixProduct(this.weights[i], this.layers[i - 1]);
       this.layers[i] = Matrix.addElementwise(this.layers[i], this.biases[i]);
       this.layers[i].map(sigmoid);
     }
@@ -69,29 +66,14 @@ class NeuralNetwork {
 
     //specify error for output layer
     let derivativeMatrix = Matrix.map(this.layers[this.depth - 1], dsigmoid);
-    errors[this.depth - 1] = Matrix.subtractElementwise(
-      this.layers[this.depth - 1],
-      targets
-    );
-    errors[this.depth - 1] = Matrix.multiplyElementwise(
-      errors[this.depth - 1],
-      derivativeMatrix
-    );
+    errors[this.depth - 1] = Matrix.subtractElementwise(this.layers[this.depth - 1], targets);
+    errors[this.depth - 1] = Matrix.multiplyElementwise(errors[this.depth - 1], derivativeMatrix);
 
     //calculate deltaB and deltaW for output layer
     let transposedInputs = Matrix.transpose(this.layers[this.depth - 2]);
-    deltaW[this.depth - 1] = Matrix.matrixProduct(
-      errors[this.depth - 1],
-      transposedInputs
-    );
-    deltaW[this.depth - 1] = Matrix.multiplyScalar(
-      deltaW[this.depth - 1],
-      -this.learningRate
-    );
-    deltaB[this.depth - 1] = Matrix.multiplyScalar(
-      errors[this.depth - 1],
-      -this.learningRate
-    );
+    deltaW[this.depth - 1] = Matrix.matrixProduct(errors[this.depth - 1], transposedInputs);
+    deltaW[this.depth - 1] = Matrix.multiplyScalar(deltaW[this.depth - 1], -this.learningRate);
+    deltaB[this.depth - 1] = Matrix.multiplyScalar(errors[this.depth - 1], -this.learningRate);
 
     //for each layer from 2nd last to 1st hidden, calculate error and then deltaW and deltaB
     for (var i = this.depth - 2; i > 0; i--) {
@@ -121,7 +103,7 @@ class NeuralNetwork {
 
     let contentObj = {
       weights: this.weights,
-      biases: this.biases
+      biases: this.biases,
     };
 
     const content = JSON.stringify(contentObj);
@@ -142,14 +124,22 @@ class NeuralNetwork {
 
       let content = JSON.parse(data);
 
-      this.weights = content.weights;
-      this.biases = content.biases;
+      for (let i = 1; i < this.depth; i++) {
+        this.weights[i] = new Matrix(this.layers[i].rows, this.layers[i - 1].rows);
+        Object.assign(this.weights[i], content.weights[i]);
+
+        this.biases[i] = new Matrix(this.layers[i].rows, 1);
+        Object.assign(this.biases[i], content.biases[i]);
+      }
 
       console.log("Loaded NN successfully");
     } catch (err) {
+      console.log(err);
       console.log("Failed to load file, going with new NN");
     }
   }
 }
 
-exports.NeuralNetwork = NeuralNetwork;
+if (typeof module !== "undefined") {
+  module.exports = NeuralNetwork;
+}

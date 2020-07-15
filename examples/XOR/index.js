@@ -1,23 +1,23 @@
 var express = require("express");
-var NeuralNetwork = require("../../src/NeuralNetwork.js").NeuralNetwork;
+var NeuralNetwork = require("../../src/NeuralNetwork.js");
 
 let data = [
   {
     input: [0, 0],
-    target: [0]
+    target: [0],
   },
   {
     input: [0, 1],
-    target: [1]
+    target: [1],
   },
   {
     input: [1, 0],
-    target: [1]
+    target: [1],
   },
   {
     input: [1, 1],
-    target: [0]
-  }
+    target: [0],
+  },
 ];
 
 let iterations = 10000;

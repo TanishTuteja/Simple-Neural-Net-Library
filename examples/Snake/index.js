@@ -9,20 +9,16 @@ var Agent = require("./Agent.js").Agent;
 
 let agent;
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   console.log("New connection");
 
-  socket.on("initialize", data => {
+  socket.on("initialize", (data) => {
     console.log("Initializing...");
-    agent = new Agent(
-      data.stateLength,
-      data.actionNum,
-      __dirname + "/configData.json"
-    );
+    agent = new Agent(data.stateLength, data.actionNum, __dirname + "/configData.json", __dirname + "/training.json");
     console.log("Done initializing");
   });
 
-  socket.on("action", data => {
+  socket.on("action", (data) => {
     let state = data.state;
     let reward = data.reward;
 
@@ -30,7 +26,7 @@ io.on("connection", socket => {
     io.emit("actionRes", { action: action });
   });
 
-  socket.on("train", data => {
+  socket.on("train", (data) => {
     console.log("Training..");
     agent.currState = null;
     agent.currAction = null;
@@ -39,7 +35,7 @@ io.on("connection", socket => {
 
   socket.on("disconnect", () => {
     console.log("Disconnected, Saving Data... ");
-    agent.saveNetwork(__dirname + "/configData.json");
+    agent.saveNetwork(__dirname + "/configData.json", __dirname + "/training.json");
   });
 });
 

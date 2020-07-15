@@ -1,13 +1,13 @@
 var express = require("express");
 var fs = require("fs");
-var NeuralNetwork = require("../../src/NeuralNetwork.js").NeuralNetwork;
+var NeuralNetwork = require("../../src/NeuralNetwork.js");
 
 let trainingData = [];
 
 let data = fs.readFileSync("iris.data", "utf-8");
 let datas = data.split("\n");
 
-datas.forEach(element => {
+datas.forEach((element) => {
   let dataPoints = element.split(",");
   let currTarget;
   switch (dataPoints[4]) {
@@ -25,13 +25,8 @@ datas.forEach(element => {
       break;
   }
   trainingData.push({
-    input: [
-      parseFloat(dataPoints[0]),
-      parseFloat(dataPoints[1]),
-      parseFloat(dataPoints[2]),
-      parseFloat(dataPoints[3])
-    ],
-    target: currTarget
+    input: [parseFloat(dataPoints[0]), parseFloat(dataPoints[1]), parseFloat(dataPoints[2]), parseFloat(dataPoints[3])],
+    target: currTarget,
   });
 });
 
@@ -86,9 +81,7 @@ function test() {
   let testStartIndex = trainingData.length * trainFrac;
 
   for (let i = testStartIndex; i < trainingData.length; i++) {
-    let index = Math.floor(
-      Math.random() * trainingData.length * (1 - trainFrac) + testStartIndex
-    );
+    let index = Math.floor(Math.random() * trainingData.length * (1 - trainFrac) + testStartIndex);
 
     let inputs = trainingData[index].input;
     let targets = trainingData[index].target;
